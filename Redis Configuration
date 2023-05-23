@@ -1,0 +1,88 @@
+Redis configuration in Centos 8
+
+Download package redis-5.0.7 from redis site,
+
+wget wget https://download.redis.io/redis-5.0.7.tar.gz
+
+Unzip the downloaded redis file:
+
+tar -xzvf redis-5.0.7.tar.gz
+
+cd redis-5.0.7
+make
+
+you can check, the installation was complete successfully by run below command,
+make test
+
+Next, install Redis binaries with the make install command:
+make install
+
+
+Now edit the redis configuration file.( Best to take backup main configuration file )
+
+vi redis.conf
+bind 172.17.11.43  								// redis server IP
+port 6379										      // redis default port
+logfile "/home/redis/redis-5.0.7/redis.log"		//add this for log
+masterauth "123456"
+requirepass "123456"
+
+
+Now Save and Exit
+
+Edit sentinel.conf,
+
+vi sentinel.conf
+bind 172.17.11.43
+port 26379										//sentinel default port
+logfile "/home/redis/sentinel.log"
+
+sentinel deny-scripts-reconfig yes
+sentinel monitor mymaster 172.17.11.43 6379 2
+sentinel auth-pass mymaster 123456
+
+Now Save and Exit
+
+Redis Start script create,
+
+vi redisStart.sh
+#!/bin/bash
+
+/home/redis/redis-5.0.7/src/redis-server /home/kona/redis-5.0.7/redis.conf > /dev/null 2> /dev/null &
+
+/home/redis/redis-5.0.7/src/redis-server /home/kona/redis-5.0.7/sentinel.conf --sentinel > /dev/null 2> /dev/null &
+
+Save & Exit
+
+chmod +x redisStart.sh
+
+Redis Stop Script create,
+vi redisStop.sh
+#!/bin/bash
+
+/home/redis/redis-5.0.7/src/redis-cli shutdown
+
+kill -9 `/bin/ps -ef | /bin/grep -i sentinel |  /bin/grep -i redis | /bin/awk '{ printf $2; }' `
+
+Save & Exit
+
+chmod +x redisStop.sh
+
+Now Create Redis Restart script using both 2 script,
+vi redisRestart.sh
+#!/bin/bash
+
+/home/redis/redis-5.0.7/redisStop.sh
+sleep 3
+/home/redis/redis-5.0.7/redisStart.sh
+
+chmod +x redisRestart.sh
+
+Check Redis Configuration:
+
+redis-cli
+127.0.0.1:6379>AUTH 123456
+
+127.0.0.1:6379> client list
+id=2 addr=127.0.0.1:50282 fd=6 name= age=12 idle=0 flags=N db=0 sub=0 psub=0 multi=-1 qbuf=0 qbuf-free=32768 obl=0 oll=0 omem=0 events=r cmd=client
+127.0.0.1:6379>

@@ -1,0 +1,152 @@
+UPay Migration.
+
+Component of CORE-1 Server:
+
+ukyc
+ukyc1
+ukyc2
+ukyc3
+knotify
+kycauth
+
+Step 1: Login ukyc client with ssh.
+
+create directory named was, bin, cfg in user home directory.
+
+check the new created file.
+
+ll -l
+
+drwxr-xr-x 2 ukyc ukyc 46 May 22 11:48 bin
+drwxr-xr-x 2 ukyc ukyc 55 May 22 10:58 cfg
+drwxr-xr-x 2 ukyc ukyc 87 May 22 10:58 error_message
+drwxr-xr-x 2 ukyc ukyc  6 May 19 08:17 gclog
+drwxr-xr-x 2 ukyc ukyc  6 May 19 08:17 images
+drwxr-xr-x 2 ukyc ukyc  6 May 19 08:17 log
+drwxr-xr-x 2 ukyc ukyc  6 May 19 08:17 logs
+drwxr-xr-x 2 ukyc ukyc 33 May 22 10:57 was
+
+Note: Here all jar file is stored in was directory.
+
+Collect .jar file and keep it local computer under Document folder.
+
+now open WinScp to CORE-1 server with username ukyc.
+
+cd was
+	- drag and drop the .jar file here.
+
+also enter in bin,
+
+cd bin
+	- drag all file here
+	
+as the same way in cfg directory.
+
+after all is complete we can justify all the file is present in CORE-1 server by below command:
+
+Login to CORE-1 server,
+
+tree /app	[ for this deployment user home directory in /app ]
+
+
+/app/
+├── knotify
+│   ├── bin
+│   │   ├── monitor
+│   │   ├── start
+│   │   └── stop
+│   ├── cfg
+│   │   ├── application.properties
+│   │   └── logback.xml
+│   ├── gclog
+│   ├── images
+│   ├── log
+│   ├── logs
+│   └── was
+│       └── knotify-1.0.jar
+├── kycauth
+│   ├── bin
+│   │   ├── monitor
+│   │   └── start
+│   ├── cfg
+│   │   ├── application.properties
+│   │   └── logback.xml
+│   ├── gclog
+│   ├── images
+│   ├── log
+│   ├── logs
+│   └── was
+│       └── authentication-server-1.0.jar
+├── ukyc
+│   ├── bin
+│   │   ├── monitor
+│   │   ├── start
+│   │   └── stop
+│   ├── cfg
+│   │   ├── application.properties
+│   │   └── logback.xml
+│   ├── error_message
+│   │   ├── apigw_en.properties
+│   │   ├── apigw_ko.properties
+│   │   └── apigw_zh.properties
+│   ├── gclog
+│   ├── images
+│   ├── log
+│   ├── logs
+│   └── was
+│       └── kyc-service-1.0.jar
+├── ukyc1
+│   ├── bin
+│   │   ├── monitor
+│   │   ├── start
+│   │   └── stop
+│   ├── cfg
+│   │   ├── application.properties
+│   │   └── logback.xml
+│   ├── error_message
+│   │   ├── apigw_en.properties
+│   │   ├── apigw_ko.properties
+│   │   └── apigw_zh.properties
+│   ├── gclog
+│   ├── images
+│   ├── log
+│   ├── logs
+│   └── was
+│       └── kyc-service-1.0.jar
+├── ukyc2
+│   ├── bin
+│   │   ├── monitor
+│   │   ├── start
+│   │   └── stop
+│   ├── cfg
+│   │   ├── application.properties
+│   │   └── logback.xml
+│   ├── error_message
+│   │   ├── apigw_en.properties
+│   │   ├── apigw_ko.properties
+│   │   └── apigw_zh.properties
+│   ├── gclog
+│   ├── images
+│   ├── log
+│   ├── logs
+│   └── was
+│       └── kyc-service-1.0.jar
+└── ukyc3
+    ├── bin
+    │   ├── monitor
+    │   ├── start
+    │   └── stop
+    ├── cfg
+    │   ├── application.properties
+    │   └── logback.xml
+    ├── error_message
+    │   ├── apigw_en.properties
+    │   ├── apigw_ko.properties
+    │   └── apigw_zh.properties
+    ├── gclog
+    ├── images
+    ├── log
+    ├── logs
+    └── was
+        └── kyc-service-1.0.jar
+

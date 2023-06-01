@@ -1,0 +1,85 @@
+Redis sentinel Cluster configuration in Ubuntu 20.04
+apt get update
+apt install gcc make tcl
+adduser redis
+su redis
+
+wget https://download.redis.io/releases/redis-5.0.7.tar.gz
+tar -zxvf redis-5.0.7.tar.gz
+cd redis-5.0.7
+
+
+On Master node(10.88.233.75):
+vim /home/redis/redis-5.0.7/redis.conf
+...
+bind 10.88.233.75
+port 6379
+logfile "/home/redis/log/redis.log"
+masterauth 123456
+requirepass "123456"
+...
+Save & Exit
+
+
+vim sentinel.conf
+...
+bind 10.88.233.75
+port 26379
+logfile "/home/redis/log/sentinel.log"
+sentinel deny-scripts-reconfig yes
+sentinel monitor mymaster 10.88.233.75 6379 2
+sentinel down-after-milliseconds mymaster 5000
+...
+Save & Exit
+
+On Slave node(10.88.233.199):
+
+
+bind 10.88.233.199
+port 6379
+logfile "/home/redis/log/redis.log"
+replicaof 10.88.233.75 6379
+masterauth 123456
+requirepass "123456"
+
+vim sentinel.conf
+...
+bind 10.88.233.199
+port 26379
+logfile "/home/redis/log/sentinel.log"
+sentinel deny-scripts-reconfig yes
+sentinel monitor mymaster 10.88.233.75 6379 2
+sentinel down-after-milliseconds mymaster 5000
+...
+Save & Exit
+
+Now create log directory in /home/redis/
+
+mkdir /home/redis/log
+
+Now create Start and Stop script:
+
+cd /home/redis/redis-5.0.7
+vim redisStart.sh
+#!/bin/bash
+/home/redis/redis-5.0.7/src/redis-server /home/redis/redis-5.0.7/redis.conf  > /dev/null 2> /dev/null &
+/home/redis/redis-5.0.7/src/redis-server /home/redis/redis-5.0.7/sentinel.conf --sentinel > /dev/null 2> /dev/null &
+
+vim redisStop.sh
+#!/bin/bash
+kill -9 `ps -ef | grep -i sentinel |  grep -i redis | awk '{ printf $2; }' `
+
+chmod +x redisStart.sh
+chmod +x redisStop.sh
+
+ps -ef | grep redis
+redis      29158       1  0 May31 ?        00:01:06 /home/redis/redis-5.0.7/src/redis-server 10.88.233.75:6379
+redis      29159       1  0 May31 ?        00:01:06 /home/redis/redis-5.0.7/src/redis-server 10.88.233.75:26379 [sentinel]
+root      102310  102264  0 03:58 pts/0    00:00:00 sudo su redis
+root      102311  102310  0 03:58 pts/0    00:00:00 su redis
+redis     102312  102311  0 03:58 pts/0    00:00:00 bash
+redis     102497  102312  0 04:02 pts/0    00:00:00 ps -ef
+redis     102498  102312  0 04:02 pts/0    00:00:00 grep --color=auto redis
+
+Now check redis
+./redis-cli -h 10.88.233.75

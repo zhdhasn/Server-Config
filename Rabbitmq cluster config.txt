@@ -1,5 +1,7 @@
 Rabbitmq cluster configuration in ubuntu 20.04
-vim /etc/hosts
+vim /etc/hosts          //in all node
+10.88.233.75 ubuntu1
+10.88.233.199 ubuntu2
 
 Installing rabbitmq:
 apt install rabbitmq-server
@@ -10,9 +12,9 @@ systemctl enable rabbitmq-server
 
 rabbitmq-plugins enable rabbitmq_management
 cd /usr/lib/rabbitmq/lib/rabbitmq_server-3.8.2/plugins/
-ll
+
 wget https://github.com/rabbitmq/rabbitmq-delayed-message-exchange/releases/download/v3.8.0/rabbitmq_delayed_message_exchange-3.8.0.ez
-cd
+
 rabbitmq-plugins enable rabbitmq_delayed_message_exchange
 systemctl restart rabbitmq-server
 rabbitmq-plugins list
@@ -29,7 +31,7 @@ Adding the Node with cluster:
 rabbitmqctl join_cluster rabbit@ubuntu1
 rabbitmqctl cluster_status
 
-Optional:
+Optional in Master node:
 rabbitmqctl set_policy ha-all ".*" '{"ha-mode":"all"}'
 rabbitmqctl set_policy ha-two "^two\."    '{"ha-mode":"exactly","ha-params":2,"ha-sync-mode":"automatic"}'
 rabbitmqctl set_policy ha-nodes "^nodes\."    '{"ha-mode":"nodes","ha-params":["rabbit@ip-172-22-78-72", "rabbit@ip-172-22-79-73"]}'

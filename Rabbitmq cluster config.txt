@@ -19,7 +19,11 @@ rabbitmq-plugins enable rabbitmq_delayed_message_exchange
 systemctl restart rabbitmq-server
 rabbitmq-plugins list
 
-scp -P 22311 /var/lib/rabbitmq/.erlang.cookie root@cloud.konasl.net:/root/SRC/
+Replace all node .erlang.cookie with master node .erlang.cookie
+scp /var/lib/rabbitmq/.erlang.cookie ubuntu@10.88.233.199:/home/ubuntu
+mv /home/ubuntu/.erlang.cookie .erlang.cookie
+chmod 400 .erlang.cookie
+chown rabbitmq:rabbitmq .erlang.cookie
 
 rabbitmqctl cluster_status
 rabbitmqctl add_user radmin kona123

@@ -1,0 +1,36 @@
+Rabbitmq cluster configuration in ubuntu 20.04
+vim /etc/hosts
+
+Installing rabbitmq:
+apt install rabbitmq-server
+
+Start Service:
+systemctl start rabbitmq-server
+systemctl enable rabbitmq-server
+
+rabbitmq-plugins enable rabbitmq_management
+cd /usr/lib/rabbitmq/lib/rabbitmq_server-3.8.2/plugins/
+ll
+wget https://github.com/rabbitmq/rabbitmq-delayed-message-exchange/releases/download/v3.8.0/rabbitmq_delayed_message_exchange-3.8.0.ez
+cd
+rabbitmq-plugins enable rabbitmq_delayed_message_exchange
+systemctl restart rabbitmq-server
+rabbitmq-plugins list
+
+scp -P 22311 /var/lib/rabbitmq/.erlang.cookie root@cloud.konasl.net:/root/SRC/
+
+rabbitmqctl cluster_status
+rabbitmqctl add_user radmin kona123
+rabbitmqctl set_user_tags radmin administrator
+rabbitmqctl set_permissions -p / radmin ".*" ".*" ".*"
+
+
+Adding the Node with cluster:
+rabbitmqctl join_cluster rabbit@ubuntu1
+rabbitmqctl cluster_status
+
+Optional:
+rabbitmqctl set_policy ha-all ".*" '{"ha-mode":"all"}'
+rabbitmqctl set_policy ha-two "^two\."    '{"ha-mode":"exactly","ha-params":2,"ha-sync-mode":"automatic"}'
+rabbitmqctl set_policy ha-nodes "^nodes\."    '{"ha-mode":"nodes","ha-params":["rabbit@ip-172-22-78-72", "rabbit@ip-172-22-79-73"]}'
+rabbitmqctl list_policies

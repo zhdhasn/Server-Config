@@ -32,7 +32,9 @@ rabbitmqctl set_permissions -p / radmin ".*" ".*" ".*"
 
 
 Adding the Node with cluster:
+rabbitmqctl stop_app
 rabbitmqctl join_cluster rabbit@ubuntu1
+rabbitmqctl start_app
 rabbitmqctl cluster_status
 
 Optional in Master node:

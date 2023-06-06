@@ -42,3 +42,61 @@ rabbitmqctl set_policy ha-all ".*" '{"ha-mode":"all"}'
 rabbitmqctl set_policy ha-two "^two\."    '{"ha-mode":"exactly","ha-params":2,"ha-sync-mode":"automatic"}'
 rabbitmqctl set_policy ha-nodes "^nodes\."    '{"ha-mode":"nodes","ha-params":["rabbit@10.88.233.75"]}'
 rabbitmqctl list_policies
+--------------------------------------------------CentOS-------------------------------------------------------------------
+yum -y install epel-release
+
+Vi /etc/hosts
+10.15.22.71 io-redisrabbit1-qa
+10.15.22.72 io-redisrabbit2-qa
+10.15.22.73 io-redisrabbit3-qa
+
+Save & Exit
+
+Download erlang package:
+
+wget https://packages.erlang-solutions.com/erlang/rpm/centos/7/x86_64/esl-erlang_24.0.2-1~centos~7_amd64.rpm
+
+Install Download package:
+yum -y insta esl-erlang_24.0.2-1~centos~7_amd64.rpm socat logrotate
+
+Test erlang:
+erl -eval 'erlang:display(erlang:system_info(otp_release)), halt().'  -noshe
+
+Download Rabbitmq package:
+wget https://github.com/rabbitmq/rabbitmq-server/releases/download/v3.8.19/rabbitmq-server-3.8.19-1.el7.noarch.rpm
+
+Install rabbitmq and service start:
+yum -y insta rabbitmq-server-3.8.19-1.el7.noarch.rpm
+systemctl start rabbitmq-server.service
+systemctl enable rabbitmq-server.service
+systemctl status rabbitmq-server.service
+
+Download delayed message plugins: 
+
+wget https://github.com/rabbitmq/rabbitmq-delayed-message-exchange/releases/download/3.8.17/rabbitmq_delayed_message_exchange-3.8.17.8f537ac.ez
+
+cd /usr/lib/rabbitmq/lib/rabbitmq_server-3.8.19/plugins/
+
+cp ~/rabbitmq_delayed_message_exchange-3.8.17.8f537ac.ez .
+
+rabbitmq-plugins enable rabbitmq_management
+rabbitmq-plugins enable rabbitmq_delayed_message_exchange
+systemctl restart rabbitmq-server
+Copy .erlang.cookie from master node to other cluster.
+scp /var/lib/rabbitmq/.erlang.cookie root@cloud.konasl.net:/home/jahid
+
+Check Rabbitmq Cluster status
+rabbitmqctl cluster_status
+
+Set Username & Password:
+rabbitmqctl add_user rabbitadmin konai
+rabbitmqctl set_user_tags rabbitadmin administrator
+rabbitmqctl set_permissions -p / rabbitadmin ".*" ".*" ".*"
+
+Optional:
+rabbitmqctl set_policy ha-a ".*" '{"ha-mode":"a"}'
+rabbitmqctl set_policy ha-two "^two\."    '{"ha-mode":"exactly","ha-params":2,"ha-sync-mode":"automatic"}'
+rabbitmqctl set_policy ha-nodes "^nodes\."    '{"ha-mode":"nodes","ha-params":["rabbit@io-redis-rabbit2", "rabbit@io-redis-rabbit3"]}'
+rabbitmqctl list_policies
+rabbitmqadmin list queues name
+
